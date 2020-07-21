@@ -1,5 +1,6 @@
 package com.udacity.jwdnd.course1.cloudstorage.mappers;
 
+import com.udacity.jwdnd.course1.cloudstorage.models.Credential;
 import com.udacity.jwdnd.course1.cloudstorage.models.User;
 import org.apache.ibatis.annotations.*;
 
@@ -14,4 +15,5 @@ public interface  UserMapper {
 
     @Delete("DELETE FROM Users WHERE username = #{username}")
     void delete(String username);
+
 }

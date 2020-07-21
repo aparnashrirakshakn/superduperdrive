@@ -4,6 +4,7 @@ import com.udacity.jwdnd.course1.cloudstorage.mappers.CredentialMapper;
 import com.udacity.jwdnd.course1.cloudstorage.mappers.UserMapper;
 import com.udacity.jwdnd.course1.cloudstorage.models.Credential;
 import org.springframework.stereotype.Service;
+import org.apache.commons.lang3.RandomStringUtils;
 
 import java.util.List;
 
@@ -20,11 +21,11 @@ public class CredentialService {
     }
 
     public int insertCredential(Credential credential) {
-        return credentialMapper.insertCredential(new Credential(null, credential.getUrl(), credential.getUsername(), credential.getKey(), credential.getPassword(), credential.getUserid()));
+        return credentialMapper.insertCredential(encryptPassword(credential));
     }
 
     public int updateCredential(Credential credential) {
-        return credentialMapper.updateCredential(credential);
+        return credentialMapper.updateCredential(encryptPassword(credential));
     }
 
     public List<Credential> getCredentials(String username) {
@@ -34,6 +35,19 @@ public class CredentialService {
 
     public void deleteCredential(Integer credentialId) {
         credentialMapper.deleteCredential(credentialId);
+    }
+
+    private Credential encryptPassword(Credential credential) {
+        String key = RandomStringUtils.random(16, true, true);
+        credential.setKey(key);
+        credential.setPassword(encryptionService.encryptValue(credential.getPassword(), key));
+        return credential;
+    }
+
+    private Credential decryptPassword(Credential credential) {
+        credential.setPassword(encryptionService.decryptValue(credential.getPassword(),
+                credential.getKey()));
+        return credential;
     }
 
 }
