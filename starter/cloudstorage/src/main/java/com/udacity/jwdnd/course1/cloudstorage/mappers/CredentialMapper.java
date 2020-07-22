@@ -17,7 +17,7 @@ public interface CredentialMapper {
     @Options(useGeneratedKeys = true, keyProperty = "credentialid")
     Integer insertCredential(Credential credential);
 
-    @Update("UPDATE Credentials SET url = #{url}, username = #{username}, password = #{password} WHERE credentialid = #{credentialid}")
+    @Update("UPDATE Credentials SET url = #{url}, username = #{username}, password = #{password}, key = #{key} WHERE credentialid = #{credentialid}")
     Integer updateCredential(Credential credential);
 
     @Delete("DELETE FROM Credentials WHERE credentialid = #{credentialid}")

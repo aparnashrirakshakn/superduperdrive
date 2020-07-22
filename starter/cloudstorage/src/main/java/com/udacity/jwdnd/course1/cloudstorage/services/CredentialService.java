@@ -4,8 +4,10 @@ import com.udacity.jwdnd.course1.cloudstorage.mappers.CredentialMapper;
 import com.udacity.jwdnd.course1.cloudstorage.mappers.UserMapper;
 import com.udacity.jwdnd.course1.cloudstorage.models.Credential;
 import org.springframework.stereotype.Service;
-import org.apache.commons.lang3.RandomStringUtils;
 
+import java.security.SecureRandom;
+import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 @Service
@@ -30,7 +32,18 @@ public class CredentialService {
 
     public List<Credential> getCredentials(String username) {
 
-        return credentialMapper.selectAllCredentials(userMapper.selectUser(username).getUserid());
+        List<Credential> credentials = credentialMapper.selectAllCredentials(userMapper.selectUser(username).getUserid());
+
+        if (credentials == null) {
+            return new ArrayList<>();
+        }
+
+        for (Credential credential : credentials) {
+            credential.setDecryptedPassword(decryptPassword(credential.getPassword(),
+                    credential.getKey()));
+        }
+
+        return credentials;
     }
 
     public void deleteCredential(Integer credentialId) {
@@ -38,16 +51,19 @@ public class CredentialService {
     }
 
     private Credential encryptPassword(Credential credential) {
-        String key = RandomStringUtils.random(16, true, true);
-        credential.setKey(key);
-        credential.setPassword(encryptionService.encryptValue(credential.getPassword(), key));
+        if (credential.getKey() == null) {
+            SecureRandom random = new SecureRandom();
+            byte[] key = new byte[16];
+            random.nextBytes(key);
+            credential.setKey(Base64.getEncoder().encodeToString(key));
+        }
+
+        credential.setPassword(encryptionService.encryptValue(credential.getPassword(), credential.getKey()));
         return credential;
     }
 
-    private Credential decryptPassword(Credential credential) {
-        credential.setPassword(encryptionService.decryptValue(credential.getPassword(),
-                credential.getKey()));
-        return credential;
+    private String decryptPassword(String password, String key) {
+        return encryptionService.decryptValue(password, key);
     }
 
 }

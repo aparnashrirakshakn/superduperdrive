@@ -207,7 +207,7 @@
                 $('#credential-id').val(credential && credential.credentialid ? credential.credentialid : '');
                 $('#credential-url').val(credential && credential.url ? credential.url : '');
                 $('#credential-username').val(credential && credential.username ? credential.username : '');
-                $('#credential-password').val(credential && credential.password ? credential.password: '');
+                $('#credential-password').val(credential && credential.decryptedPassword ? credential.decryptedPassword: '');
                 $('#credentialModal').modal('show');
             }
         </script>
